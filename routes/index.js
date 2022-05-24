@@ -1,10 +1,14 @@
-import express from 'express';
+const express = require('express');
 
-import userRouter from './user.router.js';
+const userRouter = require('./user.router.js');
+const authRouter = require('./auth.router.js');;
 
-export default function routerApiV1(app){
+function routerApiV1(app){
     const router = express.Router();
     app.use('/api/v1', router);
 
     router.use('/user', userRouter);
+    router.use('/auth', authRouter);
 }
+
+module.exports = routerApiV1;

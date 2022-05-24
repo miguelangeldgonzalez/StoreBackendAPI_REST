@@ -1,4 +1,4 @@
-import Joi from 'joi';
+const Joi = require('joi');
 
 const id = Joi.number().positive();
 const name = Joi.string().allow(' ').min(2).trim();
@@ -8,10 +8,20 @@ const role = Joi.string().pattern(/admin|user|customer/);
 
 const createUserSchema = Joi.object({
     name: name.required(),
-    "last_name": name.required(),
+    lastName: name.required(),
     email: email.required(),
     password: password.required(),
     role: role.required()
 })
 
-export { createUserSchema };
+const getUserSchema = Joi.object({
+    id: id.required()
+})
+
+const updateUserSchema = Joi.object({
+    name: name,
+    lastName: name,
+    email: email
+})
+
+module.exports = { createUserSchema, getUserSchema, updateUserSchema };
