@@ -17,12 +17,28 @@ class UserService{
         return newUser;
     }
 
+    findProfilePhoto(userId){
+        const image = path.resolve(`./public/profile_photos/${userId}.png`);
+        
+        if(fs.pathExistsSync(image)){
+            return `http://localhost:3000/public/profile_photos/${userId}.png`;
+        } else {
+            return false;
+        }
+    }
+
     async findById(id){
         const userSearched = await models.User.findByPk(id);
+
         if(!userSearched){
             throw boom.notFound('User not found');
         }
-        return userSearched;
+
+        let user = userSearched.dataValues;
+        user.image = this.findProfilePhoto(user.id);
+        delete user.password;
+
+        return user;
     }
 
     async findByEmail(email){
@@ -33,9 +49,16 @@ class UserService{
     }
 
     async findAll(){
-        return await models.User.findAll({
+        const rta = await models.User.findAll({
             attributes: { exclude: ['password'] }
         });
+
+        const users = rta.map(user => ({
+            ...user.dataValues,
+            image: this.findProfilePhoto(user.dataValues.id)
+        }))
+
+        return users;
     }
 
     async update(id, changes){

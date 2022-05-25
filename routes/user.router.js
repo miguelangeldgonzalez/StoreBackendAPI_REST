@@ -23,10 +23,16 @@ router.get('/delete_profile_image',
     }
 )
 
+const input = undefined;
+
 //Load Profile Photo
 router.post('/load_profile_image',
     passport.authenticate('jwt', {session: false}),
-    uploadHandler(),
+    async (req, res, next) => {
+        input = req.body.uploadInput;
+        next();
+    },
+    uploadHandler(input),
     async (req, res, next) => {
         try{
             const rta = await service.loadProfileImage(req.file, req.user.sub);
@@ -54,9 +60,13 @@ router.post('/',
 //Get all users
 router.get('/',
     passport.authenticate('jwt', {session: false}),
-    async (req, res) => {
-        const rta = await service.findAll();
-        res.status(200).json(rta);
+    async (req, res, next) => {
+        try{
+            const rta = await service.findAll();
+            res.status(200).json(rta);
+        } catch (error) {
+            next(error);
+        }
     }
 )
 
@@ -64,8 +74,8 @@ router.get('/',
 router.get('/:id',
     validatorHandler(getUserSchema, 'params'),
     async (req, res) => {
-        const data = req.params;
-        const rta = await service.findById(data);
+        const id = req.params.id;
+        const rta = await service.findById(id);
         res.status(200).json(rta);
     }
 );
