@@ -3,6 +3,7 @@ const passport = require('passport');
 
 const UserService = require('./../services/user.service.js');
 const validatorHandler = require('./../middlewares/validator.handler.js');
+const { checkSameOrAdminRole } = require('../middlewares/auth.handler.js');
 
 const { uploadHandler } = require('../middlewares/upload.handler');
 const { createUserSchema, getUserSchema, updateUserSchema } = require('../schemas/user.schema.js');
@@ -13,6 +14,7 @@ const service = new UserService();
 //Delete Profile Photo
 router.get('/delete_profile_image', 
     passport.authenticate('jwt', {session: false}),
+    checkSameOrAdminRole(),
     async (req, res, next) => {
         try{
             const rta = await service.deleteProfilePhoto(req.user.sub);
@@ -23,20 +25,14 @@ router.get('/delete_profile_image',
     }
 )
 
-const input = undefined;
-
 //Load Profile Photo
 router.post('/load_profile_image',
     passport.authenticate('jwt', {session: false}),
-    async (req, res, next) => {
-        input = req.body.uploadInput;
-        next();
-    },
-    uploadHandler(input),
+    uploadHandler(),
     async (req, res, next) => {
         try{
-            const rta = await service.loadProfileImage(req.file, req.user.sub);
-            res.status(201).json({ message: "Image loaded correctly" });
+            const rta = await service.loadProfileImage(req.files[0], req.user.sub);
+            if (rta) res.status(201).json({ message: "Image loaded correctly" });
         } catch (error) {
             next(error)
         }
@@ -82,6 +78,8 @@ router.get('/:id',
 
 //Edit user
 router.patch('/:id',
+    passport.authenticate('jwt', { session: false}),
+    checkSameOrAdminRole(),
     validatorHandler(getUserSchema, 'params'),
     validatorHandler(updateUserSchema, 'body'),
     async (req, res, next) => {
@@ -97,17 +95,24 @@ router.patch('/:id',
 
 //Delete user
 router.delete('/:id',
-  validatorHandler(getUserSchema, 'params'),
-  async (req, res, next) => {
-    try {
-        const rta = await service.delete(req.params.id);
-        res.status(202).json({
-            message: "Deleted"
-        })
-    } catch(error){
-        next(error);
+    passport.authenticate('jwt', {session: false}),
+    checkSameOrAdminRole(),
+    validatorHandler(getUserSchema, 'params'),
+    async (req, res, next) => {
+        try {
+            const rta = await service.delete(req.params.id);
+            res.status(202).json({
+                message: "Deleted"
+            })
+        } catch(error){
+            next(error);
+        }
     }
-  }
 );
 
 module.exports = router;
+
+//miranda:
+//"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEzLCJyb2xlIjoiY3VzdG9tZXIiLCJpYXQiOjE2NTM0OTA0MjF9.eh3BTEXDfRU7SZoXS_rl3Hf0XDXNw353KFGw_xSW62g"
+//cristina:
+//"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjExLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2NTM0OTA2ODV9.WLNANrknYHceYa2jciix0lqxm6Q4WSLB5NCcfMZGFw8"

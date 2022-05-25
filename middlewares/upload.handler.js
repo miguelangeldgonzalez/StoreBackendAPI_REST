@@ -2,7 +2,7 @@ const boom = require('@hapi/boom');
 const multer = require('multer');
 const path = require('path');
 
-function uploadHandler(input){
+function uploadHandler(){
     const storage = route => multer.diskStorage({
         destination: path.join(__dirname, route),
         filename: (req, file, cb) => {
@@ -26,7 +26,7 @@ function uploadHandler(input){
         limits: {
             fileSize: 3000000
         }
-    }).single(input || 'archivo');
+    }).any();
 }
 
 module.exports = { uploadHandler }

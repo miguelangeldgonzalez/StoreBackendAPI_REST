@@ -62,13 +62,24 @@ class UserService{
     }
 
     async update(id, changes){
-        const user = await this.findById(id);
+        const user = await models.User.findByPk(id);
+
+        if(!user){
+            throw boom.notFound('User not found');
+        }
+
         const rta = await user.update(changes);
+        delete rta.dataValues.password;
         return rta;
     }
 
     async delete(id){
-        const user = await this.findById(id);
+        const user = await models.User.findByPk(id);
+
+        if(!user){
+            throw boom.notFound('User not found');
+        }
+
         const rta = await user.destroy();
         return rta;
     }

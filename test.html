@@ -22,25 +22,25 @@
                 method: 'POST',
                 body: form,
                 headers: {
-                    Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjExLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2NTMyMjg1MTR9.1WnoCiapTBwgQ1ujYIdx7F7dD_VE1JujAHbc4O-emO0'
+                    Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEzLCJyb2xlIjoiY3VzdG9tZXIiLCJpYXQiOjE2NTM0OTA0MjF9.eh3BTEXDfRU7SZoXS_rl3Hf0XDXNw353KFGw_xSW62g'
                 }
             })
                 .then(response => response.json())
                 .then(data => console.log(data));
         })
 
-        document.querySelector("#delete").addEventListener("click", e => {
+        /*document.querySelector("#delete").addEventListener("click", e => {
             e.preventDefault();
             const form = new FormData(document.querySelector("#form"));
             fetch('http://localhost:3000/api/v1/user/delete_profile_image', {
                 method: 'GET',
                 headers: {
-                    Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjExLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2NTMyMjg1MTR9.1WnoCiapTBwgQ1ujYIdx7F7dD_VE1JujAHbc4O-emO0'
+                    Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEzLCJyb2xlIjoiY3VzdG9tZXIiLCJpYXQiOjE2NTM0OTA0MjF9.eh3BTEXDfRU7SZoXS_rl3Hf0XDXNw353KFGw_xSW62g'
                 }
             })
                 .then(response => response.json())
                 .then(data => console.log(data));
-        })
+        })*/
     </script>
 </body>
 </html>
