@@ -50,13 +50,15 @@ class UserService{
 
     async findAll(){
         const rta = await models.User.findAll({
-            attributes: { exclude: ['password'] }
+            attributes: { 
+                exclude: ['password'] 
+            }
         });
 
         const users = rta.map(user => ({
             ...user.dataValues,
             image: this.findProfilePhoto(user.dataValues.id)
-        }))
+        }));
 
         return users;
     }

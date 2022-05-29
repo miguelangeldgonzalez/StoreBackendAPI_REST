@@ -1,10 +1,3 @@
-const fs = require('fs-extra');
-const path = require('path');
+const { DataTypes } = require('sequelize');
 
-async function read (){
-    fs.readdir('./routes', (err, files) => {
-        console.log(files);
-    })
-}
-
-read();
+console.log(DataTypes.UUIDV4);

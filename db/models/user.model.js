@@ -41,10 +41,6 @@ const UserSchema = {
 }
 
 class User extends Model{
-    static associate(models){
-
-    }
-
     static config(sequelize){
         return {
             sequelize,
@@ -52,6 +48,13 @@ class User extends Model{
             modelName: 'User',
             timestamps: false
         }
+    }
+
+    static associate(models){
+        this.hasMany(models.PurchaseOrders, { 
+            as: 'purchaseOrders', 
+            foreignKey: 'buyerId'
+        })
     }
 }
 
