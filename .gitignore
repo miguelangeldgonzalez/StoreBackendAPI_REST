@@ -3,3 +3,5 @@ node_modules
 public/profile_photos/*
 public/temp/*
 public/uploads/*
+test.html
+test.js

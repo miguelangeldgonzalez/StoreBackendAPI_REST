@@ -2,10 +2,10 @@ const express = require('express');
 const passport = require('passport');
 
 const UserService = require('./../services/user.service.js');
+const { uploadHandler } = require('../middlewares/upload.handler');
 const validatorHandler = require('./../middlewares/validator.handler.js');
 const { checkSameOrAdminRole } = require('../middlewares/auth.handler.js');
 
-const { uploadHandler } = require('../middlewares/upload.handler');
 const { createUserSchema, getUserSchema, updateUserSchema } = require('../schemas/user.schema.js');
 
 const router = express.Router();
@@ -26,7 +26,7 @@ router.get('/delete_profile_image',
 )
 
 //Load Profile Photo
-router.post('/load_profile_image',
+router.post('/upload_profile_image',
     passport.authenticate('jwt', {session: false}),
     uploadHandler(),
     async (req, res, next) => {

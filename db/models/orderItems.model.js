@@ -51,7 +51,7 @@ class OrderItems extends Model{
         });
 
         this.hasOne(models.Products, {
-            as: 'products',
+            as: 'product',
             sourceKey: 'productId',
             foreignKey: 'id'
         })
