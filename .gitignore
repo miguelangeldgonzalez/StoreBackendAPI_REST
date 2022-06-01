@@ -1,7 +1,8 @@
 node_modules
 .env
 public/profile_photos/*
-public/temp/*
+public/products/*
 public/uploads/*
+public/temp/*
 test.html
 test.js
