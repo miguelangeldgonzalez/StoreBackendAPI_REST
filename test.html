@@ -24,7 +24,7 @@
         document.querySelector("#form").addEventListener("submit", e => {
             e.preventDefault();
             const form = new FormData(document.querySelector("#form"));
-            form.append('field', 'archivo');
+            form.append('field', 'arhivo');
             //a por f
             form.append('id', 'fac48e01-7735-494b-a919-2136d0c1715c');
             fetch('http://localhost:3000/api/v1/products/upload_product_images', {

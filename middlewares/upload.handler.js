@@ -31,6 +31,11 @@ function productUploadHandler(){
                 return;
             } 
 
+            if(files[fields.field] == undefined) {
+                reject(boom.badRequest('Field not found'));
+                return;
+            }
+
             try{
                 await service.findById(fields.id);
             }catch (error){

@@ -7,12 +7,22 @@ const { models } = require('../libs/sequelize');
 
 class Products{
     async findById(id){
-        const product = await models.Products.findByPk(id);
-        if(!product) throw boom.badData('There is not a produt with that id');
-        return product.dataValues;
+        const product = await models.Products.findOne({
+            where: {
+                id, 
+                discontinued: false
+            }
+        });
+        if(!product) throw boom.notFound('Product not found');
+        return product;
     }
+
     async findAll(){
-        const rta = await models.Products.findAll();
+        const rta = await models.Products.findAll({
+            where: {
+                discontinued: false
+            }
+        });
         return rta;
     }
 
@@ -21,19 +31,43 @@ class Products{
         return rta;
     }
 
-    async uploadPhotos(files, id){
-        const productPath = path.resolve(`./public/products/${id}`);
+    async update(id, changes){
+        const product = await this.findById(id);
+        const rta = await product.update(changes);
 
-        await fs.ensureDir(productPath);
-        const uploadedProductImages = await fs.readdir(productPath);
-        const imagesCanUpload = maxProductImage - uploadedProductImages.length;
+        return rta;
+    }
 
-        for(let i = 0; i < files.length; i++){
-            if(i < imagesCanUpload){
-                fs.move(files[i].path, productPath);
-            }else{
-                fs.remove(file.path);
+    async delete(id){
+        let product = await this.findById(id);
+        product = await product.update({discontinued: true, stock: 0});
+
+        const orderItems = await models.OrderItems.findAll({
+            where: {
+                "product_id": id
             }
+        });
+        console.log(orderItems);
+        if(orderItems.length > 0) orderItems.forEach(item => item.destroy());
+
+        fs.remove(path.resolve(`./public/products/${id}`));
+    }
+
+    async deleteImageProduct(id, images, deleteAll = false){
+        await this.findById(id);
+        const productDir = path.resolve("./public/products/" + id);
+
+        if(fs.pathExistsSync(productDir)){
+            if (deleteAll) {
+                fs.removeSync(productDir);
+            } else {
+                images.forEach(image => {
+                    fs.remove(`${productDir}\\${image}`);
+                })
+            }
+
+        } else {
+            throw boom.notFound("This product doesn't have images");
         }
     }
 }
