@@ -5,6 +5,12 @@ const {PRODUCTS_TABLE} = require('./products.model');
 const ORDER_ITEMS_TABLE = 'order_items';
 
 const OrderItemsSchema = {
+    id: {
+        allowNull: false,
+        autoIncrement: true,
+        primaryKey: true,
+        type: DataTypes.INTEGER
+    },
     purchaseOrderId: {
         type: DataTypes.UUID,
         allowNull: false,
@@ -14,7 +20,7 @@ const OrderItemsSchema = {
             key: 'id'
         },
         onUpdate: 'CASCADE',
-        onDelete: 'SET NULL'
+        onDelete: 'CASCADE'
     },
     productId: {
         type: DataTypes.UUID,
@@ -25,7 +31,7 @@ const OrderItemsSchema = {
             key: 'id'
         },
         onUpdate: 'CASCADE',
-        onDelete: 'SET NULL'
+        onDelete: 'CASCADE'
     },
     quantity: {
         type: DataTypes.INTEGER,

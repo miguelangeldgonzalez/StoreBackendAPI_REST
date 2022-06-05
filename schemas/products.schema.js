@@ -9,7 +9,7 @@ const createdAt = Joi.date();
 const discontinued = Joi.boolean();
 const field = Joi.string();
 
-const getProductImageSchema = Joi.object({
+const uploadProductImageSchema = Joi.object({
     id: id.required(),
     field: field.required()
 });
@@ -43,4 +43,4 @@ const deleteImagesProduct = Joi.object({
     images: Joi.array().items(Joi.string())
 }).or('deleteAll', 'images');
 
-module.exports = { getProductImageSchema, getProductSchema, deleteImagesProduct, editProductSchema, createProductSchema };
+module.exports = { uploadProductImageSchema, getProductSchema, deleteImagesProduct, editProductSchema, createProductSchema };

@@ -4,7 +4,7 @@ const multer = require('multer');
 const fs = require('fs-extra');
 const path = require('path');
 
-const { getProductSchema } = require('../schemas/products.schema');
+const { uploadProductImageSchema } = require('../schemas/products.schema');
 
 const ProductsService = require('../services/products.service');
 const service = new ProductsService();
@@ -25,7 +25,7 @@ function productUploadHandler(){
         formidable({ 
             multiples: true
         }).parse(req, async (err, fields, files) => {
-            const { error } = getProductSchema.validate(fields);
+            const { error } = uploadProductImageSchema.validate(fields);
             if (error) {
                 reject(boom.badRequest(error));
                 return;
@@ -39,7 +39,7 @@ function productUploadHandler(){
             try{
                 await service.findById(fields.id);
             }catch (error){
-                reject(boom.badRequest('There is not a product with that ID'));
+                reject(boom.notFound('There is not a product with that ID'));
                 return;
             }
 
@@ -63,7 +63,7 @@ function productUploadHandler(){
                         let finalName = Math.floor(Math.random() * 200) + "." + ext;
                         let dest = destination + "\\" + finalName;
 
-                        try{ fs.move(image.filepath, dest); } catch (e) {}
+                        try{ fs.rename(image.filepath, dest); } catch (e) {}
                         return dest;
                     }
                 });

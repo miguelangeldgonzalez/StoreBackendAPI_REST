@@ -14,9 +14,6 @@ function SetupModels(sequelize){
     Products.associate(sequelize.models);
     OrderItems.associate(sequelize.models);
     PurchaseOrders.associate(sequelize.models);
-
-    //Tables without a primary key
-    OrderItems.removeAttribute('id');
 }
 
 module.exports = SetupModels;

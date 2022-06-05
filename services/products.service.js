@@ -1,7 +1,6 @@
 const path = require('path');
 const fs = require('fs-extra');
 const boom = require('@hapi/boom');
-const { maxProductImage } = require('../config/config');
 
 const { models } = require('../libs/sequelize');
 
@@ -17,13 +16,32 @@ class Products{
         return product;
     }
 
+    searchProductImage(id) {
+        const pathImage = path.resolve(`./public/products/${id}`);
+        if(fs.pathExistsSync(pathImage)){
+            return fs.readdirSync(pathImage).map(dir => {
+                return path.resolve(`./public/${id}/${dir}`);
+            });
+        } else {
+            return [];
+        }
+    }
+
+    async findOne(id) {
+        const product = await this.findById(id);
+
+        product.dataValues.images = this.searchProductImage(id);
+        return product.dataValues;
+    }
+
     async findAll(){
-        const rta = await models.Products.findAll({
-            where: {
-                discontinued: false
-            }
+        const rta = await models.Products.findAll();
+        return rta.map(product => {
+            return {
+                ...product.dataValues,
+                images: this.searchProductImage(product.id)
+            } 
         });
-        return rta;
     }
 
     async create(data){
@@ -47,7 +65,7 @@ class Products{
                 "product_id": id
             }
         });
-        console.log(orderItems);
+
         if(orderItems.length > 0) orderItems.forEach(item => item.destroy());
 
         fs.remove(path.resolve(`./public/products/${id}`));

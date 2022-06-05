@@ -1,4 +1,5 @@
 const express = require('express');
+const passport = require('passport');
 const ProductsService = require('../services/products.service');
 
 const { getProductSchema, 
@@ -6,8 +7,9 @@ const { getProductSchema,
         editProductSchema,
         createProductSchema } = require('../schemas/products.schema');
 
-const { productUploadHandler } = require('../middlewares/upload.handler');
+const { checkAdminRole } = require('../middlewares/auth.handler');
 const validatorHandler = require('../middlewares/validator.handler');
+const { productUploadHandler } = require('../middlewares/upload.handler');
 
 const router = express.Router();
 const service = new ProductsService();
@@ -20,8 +22,22 @@ router.get('/',
     }
 );
 
+//GEt product by id
+router.get('/:id',
+    async (req, res, next) => {
+        try {
+            const rta = await service.findOne(req.params.id);
+            res.status(200).json(rta);
+        } catch (error) {
+            next(error);
+        }
+    }
+)
+
 //Create product
 router.post('/',
+    passport.authenticate('jwt', {session: false}),
+    checkAdminRole(),
     validatorHandler(createProductSchema, 'body'),
     async (req, res) => {
         const rta = await service.create(req.body);
@@ -31,6 +47,8 @@ router.post('/',
 
 //Edit product
 router.patch('/',
+    passport.authenticate('jwt', {session: false}),
+    checkAdminRole(),
     validatorHandler(editProductSchema, 'body'),
     async (req, res, next) => {
         try{
@@ -42,7 +60,9 @@ router.patch('/',
     }
 )
 
-router.delete('/', 
+router.delete('/',
+    passport.authenticate('jwt', {session: false}),
+    checkAdminRole(),
     validatorHandler(getProductSchema, 'body'),
     async (req, res, next) => {
          try{
@@ -55,10 +75,16 @@ router.delete('/',
 )
 
 //Load products photos
-router.post('/upload_product_images', productUploadHandler());
+router.post('/upload_product_images', 
+    passport.authenticate('jwt', {session: false}),
+    checkAdminRole(),
+    productUploadHandler()
+);
 
 //Delete products photos
 router.delete('/delete_product_image',
+    passport.authenticate('jwt', {session: false}),
+    checkAdminRole(),
     validatorHandler(deleteImagesProduct, 'body'),
     async (req, res, next) => {
         try {

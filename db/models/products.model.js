@@ -29,11 +29,6 @@ const ProductsSchema = {
         defaultValue: Sequelize.NOW,
         allowNull: false,
         field: 'created_at'
-    },
-    discontinued: {
-        type: DataTypes.BOOLEAN,
-        defaultValue: false,
-        allowNull: false
     }
 }
 
