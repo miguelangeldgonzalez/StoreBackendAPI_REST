@@ -1,6 +1,6 @@
-const { Model, DataTypes } = require('sequelzie');
+const { Model, DataTypes } = require('sequelize');
 
-const DELETED_PRODUCTS = 'deleted_products';
+const DELETED_PRODUCTS_TABLE = 'deleted_products';
 
 const DeletedProductsSchema = {
     id: {
@@ -30,15 +30,17 @@ class DeletedProducts extends Model {
     static config(sequelize){
         return {
             sequelize,
-            tableName: DELETED_PRODUCT,
+            tableName: DELETED_PRODUCTS_TABLE,
             modelName: 'DeletedProduct',
             timestamps: false
         }
     }
 
     static association(models){
+        this.hasMany(models.Sales, {
 
+        })
     }
 }
 
-module.exports = { DeletedProducts, DeletedProductsSchema, DELETED_PRODUCTS}
+module.exports = { DeletedProducts, DeletedProductsSchema, DELETED_PRODUCTS_TABLE}

@@ -13,6 +13,24 @@ const SalesSchesma = {
         allowNull: false
     },
     productId: {
-        
+        type: DataTypes.UUID,
+        allowNull: false
     }
 }
+
+class Sales extends Model {
+    static config(sequelize){
+        return {
+            sequelize,
+            tableName: SALES_TABLE,
+            modelName: 'Sales',
+            timestamps: false
+        }
+    }
+
+    static association(models){
+
+    }
+}
+
+module.exports = {SALES_TABLE, SalesSchesma, Sales}
