@@ -47,6 +47,11 @@ class Products extends Model{
             as: 'orders',
             foreignKey: 'productId'
         });*/
+
+        this.hasMany(models.Sales, {
+            foreignKey: 'product_id',
+            constraints: false
+        })
     }
 }
 

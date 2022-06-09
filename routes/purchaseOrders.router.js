@@ -42,4 +42,16 @@ router.delete('/',
     }
 )
 
+//Set as finished
+router.post('/finished',
+    async (req, res, next) => {
+        try {
+            const rta = await service.setAsFinished(req.body);
+            res.status(200).json(rta);
+        } catch (error) {
+            next(error)
+        }
+    }
+)
+
 module.exports = router;

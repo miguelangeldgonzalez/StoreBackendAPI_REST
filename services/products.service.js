@@ -6,12 +6,7 @@ const { models } = require('../libs/sequelize');
 
 class Products{
     async findById(id){
-        const product = await models.Products.findOne({
-            where: {
-                id, 
-                discontinued: false
-            }
-        });
+        const product = await models.Products.findByPk(id);
         if(!product) throw boom.notFound('Product not found');
         return product;
     }
@@ -57,8 +52,20 @@ class Products{
     }
 
     async delete(id){
-        let product = await this.findById(id);
-        product = await product.update({discontinued: true, stock: 0});
+        const sales = await models.Sales.findOne({
+            where: {
+                productId: id
+            }
+        });
+
+        const product = await this.findById(id);
+
+        if (sales) await models.DeletedProducts.create({
+            id,
+            price: product.dataValues.price,
+            name: product.dataValues.name,
+            description: product.dataValues.description
+        });
 
         const orderItems = await models.OrderItems.findAll({
             where: {
@@ -69,6 +76,8 @@ class Products{
         if(orderItems.length > 0) orderItems.forEach(item => item.destroy());
 
         fs.remove(path.resolve(`./public/products/${id}`));
+
+        product.destroy();
     }
 
     async deleteImageProduct(id, images, deleteAll = false){

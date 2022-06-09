@@ -1,5 +1,6 @@
 const {Model, DataTypes, Sequelize} = require('sequelize');
-const {USER_TABLE} = require('../models/user.model');
+
+const polymorphic = require('../polymorphic');
 
 const PURCHASE_ORDERS_TABLE = 'purchase_orders';
 
@@ -15,14 +16,8 @@ const PurchaseOrdersSchema = {
     },
     buyerId: {
         allowNull: false,
-        type: DataTypes.INTEGER,
+        type: DataTypes.UUID,
         field: 'buyer_id',
-        references: {
-            model: USER_TABLE,
-            key: 'id'
-        },
-        onUpdate: 'CASCADE',
-        onDelete: 'SET NULL'
     },
     orderedAt: {
         type: DataTypes.DATE,
@@ -36,7 +31,7 @@ const PurchaseOrdersSchema = {
         allowNull: true,
         field: 'finished_at'
     }
-}
+} 
 
 class PurchaseOrders extends Model{
     static config(sequelize){
@@ -49,13 +44,22 @@ class PurchaseOrders extends Model{
     }
 
     static associate(models){
-        this.belongsTo(models.User, {
-            as: 'buyer', 
-            sourceKey: 'buyerId'
-        });
+        const options = {
+            foreignKey: 'buyer_id',
+            constraints: false
+        };
+
+        this.belongsTo(models.User, options);
+        this.belongsTo(models.DeletedUsers, options);
+
+        this.addHook('afterFind', findResult => polymorphic(findResult, 'User', 'DeletedUsers', 'buyer'));
 
         this.hasMany(models.OrderItems, {
             as: 'orderItems', 
+            foreignKey: 'purchaseOrderId'
+        });
+
+        this.hasMany(models.Sales, {
             foreignKey: 'purchaseOrderId'
         });
     }

@@ -16,12 +16,8 @@ const DeletedProductsSchema = {
         type: DataTypes.STRING,
         allowNull: false
     },
-    productId: {
-        type: DataTypes.UUID,
-        allowNull: false
-    },
-    productDeleted: {
-        type: DataTypes.BOOLEAN,
+    description: {
+        type: DataTypes.STRING,
         allowNull: false
     }
 }
@@ -31,14 +27,15 @@ class DeletedProducts extends Model {
         return {
             sequelize,
             tableName: DELETED_PRODUCTS_TABLE,
-            modelName: 'DeletedProduct',
+            modelName: 'DeletedProducts',
             timestamps: false
         }
     }
 
-    static association(models){
+    static associate(models){
         this.hasMany(models.Sales, {
-
+            foreignKey: 'product_id',
+            constraints: false
         })
     }
 }

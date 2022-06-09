@@ -5,9 +5,9 @@ const USER_TABLE = 'users';
 const UserSchema = {
     id: {
         allowNull: false,
-        autoIncrement: true,
         primaryKey: true,
-        type: DataTypes.INTEGER
+        type: DataTypes.UUID,
+        defaultValue: DataTypes.UUIDV4
     },
     email: {
         allowNull: false,
@@ -52,9 +52,8 @@ class User extends Model{
 
     static associate(models){
         this.hasMany(models.PurchaseOrders, { 
-            as: 'purchaseOrders', 
             foreignKey: 'buyerId'
-        })
+        });
     }
 }
 
