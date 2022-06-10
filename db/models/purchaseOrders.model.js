@@ -45,22 +45,37 @@ class PurchaseOrders extends Model{
 
     static associate(models){
         const options = {
-            foreignKey: 'buyer_id',
+            foreignKey: 'buyerId',
             constraints: false
         };
 
         this.belongsTo(models.User, options);
         this.belongsTo(models.DeletedUsers, options);
 
-        this.addHook('afterFind', findResult => polymorphic(findResult, 'User', 'DeletedUsers', 'buyer'));
+        this.addHook('afterFind', findResult => polymorphic(findResult, 'User', 'DeletedUser', 'buyer'));
 
         this.hasMany(models.OrderItems, {
             as: 'orderItems', 
             foreignKey: 'purchaseOrderId'
         });
 
-        this.hasMany(models.Sales, {
-            foreignKey: 'purchaseOrderId'
+        this.addHook('afterFind', async findResult => {
+            if(findResult){
+                if(!Array.isArray(findResult)) findResult = [findResult];
+                for (const instance of findResult) {
+                    if (instance.dataValues.finishedAt != null){
+                        let sales = await models.Sales.findAll({
+                            where: {
+                                purchaseOrderId: instance.dataValues.id
+                            },
+                            include: [models.Products, models.DeletedProducts],
+                            attributes: ['price', 'quantity']
+                        });
+
+                        instance.dataValues.orderItems = sales;
+                    }
+                }
+            }
         });
     }
 }

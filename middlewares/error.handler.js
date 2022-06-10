@@ -40,7 +40,7 @@ function ormErrorHandler(err, req, res, next) {
     res.status(409).json({
       statusCode: 409,
       message: err.name,
-      errors: err.errors
+      errors: err.parent.detail
     });
   }
   next(err);

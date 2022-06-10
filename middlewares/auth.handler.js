@@ -23,12 +23,13 @@ function checkRoles(...roles){
 
 function checkSameOrAdminRole() {
     return (req, res, next) => {
-        const user = req.user;
+        const id = !req.query.id ? req.user.sub : req.query.id;
 
-        if(user.role === "admin" || user.sub == req.params.id){
+        if (req.user.role != "admin") {
+            if (req.query.id != req.user.sub) next(boom.forbidden('Only permited same or admin'));
             next();
         }else{
-            next(boom.forbidden());
+            next()
         }
     }
 }

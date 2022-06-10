@@ -1,8 +1,10 @@
+const { Op } = require('sequelize');
 const boom = require('@hapi/boom');
 const bcrypt = require('bcrypt');
 const fs = require('fs-extra');
 const Jimp = require('jimp');
 const path = require('path');
+
 
 const { models } = require('./../libs/sequelize.js');
 
@@ -78,9 +80,39 @@ class UserService{
     async delete(id){
         const user = await models.User.findByPk(id);
 
-        if(!user){
-            throw boom.notFound('User not found');
+        if(!user) throw boom.notFound('User not found');
+        
+        try { await this.deleteProfilePhoto(id) } catch(e) { }
+
+        const finishedOrder = await models.PurchaseOrders.findOne({
+            where: {
+                buyerId: id,
+                finishedAt: {
+                    [Op.not]: null
+                }
+            }
+        })
+
+        if (finishedOrder) {
+            const deletedUser = {
+                id: user.dataValues.id,
+                name: user.dataValues.name,
+                lastName: user.dataValues.lastName,
+            };
+
+            await models.DeletedUsers.create(deletedUser);
         }
+
+        const orders = await models.PurchaseOrders.findAll({
+            where: {
+                buyerId: id,
+                finishedAt: {
+                    [Op.is]: null
+                }
+            } 
+        })
+
+        if (orders) orders.forEach(async order => order.destroy());
 
         const rta = await user.destroy();
         return rta;

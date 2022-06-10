@@ -52,7 +52,8 @@ class User extends Model{
 
     static associate(models){
         this.hasMany(models.PurchaseOrders, { 
-            foreignKey: 'buyerId'
+            foreignKey: 'buyerId',
+            constraints: false
         });
     }
 }

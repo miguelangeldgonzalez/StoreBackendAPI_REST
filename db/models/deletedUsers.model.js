@@ -2,7 +2,7 @@ const {Model, DataTypes} = require('sequelize');
 
 const DELETED_USERS_TABLE = 'deleted_users';
 
-const DeletedUSersSchema = {
+const DeletedUsersSchema = {
     id: {
         allowNull: false,
         primaryKey: true,
@@ -31,10 +31,10 @@ class DeletedUsers extends Model {
 
     static associate(models){
         this.hasMany(models.PurchaseOrders, {
-            foreignKey: 'buyer_id',
+            foreignKey: 'buyerId',
             constraints: false
         })
     }
 }
 
-module.exports = { DELETED_USERS_TABLE, DeletedUSersSchema, DeletedUsers };
+module.exports = { DELETED_USERS_TABLE, DeletedUsersSchema, DeletedUsers };

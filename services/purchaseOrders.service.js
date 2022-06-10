@@ -13,10 +13,11 @@ class Orders{
                     attributes: {
                         exclude: ['password', 'createdAt', 'role']
                     }
-                },
-                {
+                },{
+                    model: models.DeletedUsers
+                },{
                     association: 'orderItems',
-                    attributes: ['id', 'quantity'],
+                    attributes: ['quantity'],
                     include: [{
                         association: 'product',
                         exclude: ['createdAt']
@@ -24,7 +25,7 @@ class Orders{
                 }
             ],
             attributes: {
-                exclude: ['buyer_id']
+                exclude: ['buyer_id', 'buyerId']
             }
         };
     }

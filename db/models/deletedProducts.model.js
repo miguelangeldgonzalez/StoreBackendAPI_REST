@@ -33,8 +33,8 @@ class DeletedProducts extends Model {
     }
 
     static associate(models){
-        this.hasMany(models.Sales, {
-            foreignKey: 'product_id',
+        this.hasMany(models.PurchaseOrders, {
+            foreignKey: 'buyer_id',
             constraints: false
         })
     }

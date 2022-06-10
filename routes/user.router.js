@@ -1,12 +1,16 @@
 const express = require('express');
+const boom = require('@hapi/boom');
 const passport = require('passport');
 
 const UserService = require('./../services/user.service.js');
 const { uploadHandler } = require('../middlewares/upload.handler');
 const validatorHandler = require('./../middlewares/validator.handler.js');
-const { checkSameOrAdminRole } = require('../middlewares/auth.handler.js');
+const { checkSameOrAdminRole, checkAdminRole } = require('../middlewares/auth.handler.js');
 
-const { createUserSchema, getUserSchema, updateUserSchema } = require('../schemas/user.schema.js');
+const { createUserSchema, 
+        getUserSchema, 
+        updateUserSchema, 
+        getEditUserSchema } = require('../schemas/user.schema.js');
 
 const router = express.Router();
 const service = new UserService();
@@ -56,6 +60,7 @@ router.post('/',
 //Get all users
 router.get('/',
     passport.authenticate('jwt', {session: false}),
+    checkAdminRole(),
     async (req, res, next) => {
         try{
             const rta = await service.findAll();
@@ -68,6 +73,7 @@ router.get('/',
 
 //Get user by id
 router.get('/:id',
+    passport.authenticate('jwt', {session: false}),
     validatorHandler(getUserSchema, 'params'),
     async (req, res) => {
         const id = req.params.id;
@@ -77,14 +83,14 @@ router.get('/:id',
 );
 
 //Edit user
-router.patch('/:id',
+router.patch('/',
     passport.authenticate('jwt', { session: false}),
     checkSameOrAdminRole(),
-    validatorHandler(getUserSchema, 'params'),
+    validatorHandler(getUserSchema, 'query'),
     validatorHandler(updateUserSchema, 'body'),
     async (req, res, next) => {
         try{
-            const rta = await service.update(req.params.id, req.body);
+            const rta = await service.update(req.user.sub, req.body);
             res.status(202).json(rta);
             return rta;
         }catch(error){
@@ -94,13 +100,15 @@ router.patch('/:id',
 );
 
 //Delete user
-router.delete('/:id',
+router.delete('/',
     passport.authenticate('jwt', {session: false}),
     checkSameOrAdminRole(),
-    validatorHandler(getUserSchema, 'params'),
+    validatorHandler(getUserSchema, 'query'),
     async (req, res, next) => {
+        const id = req.query.id == undefined ? req.user.sub : req.query.id;
+
         try {
-            const rta = await service.delete(req.params.id);
+            const rta = await service.delete(id);
             res.status(202).json({
                 message: "Deleted"
             })
@@ -111,8 +119,3 @@ router.delete('/:id',
 );
 
 module.exports = router;
-
-//miranda:
-//"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEzLCJyb2xlIjoiY3VzdG9tZXIiLCJpYXQiOjE2NTM0OTA0MjF9.eh3BTEXDfRU7SZoXS_rl3Hf0XDXNw353KFGw_xSW62g"
-//cristina:
-//"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjExLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2NTM0OTA2ODV9.WLNANrknYHceYa2jciix0lqxm6Q4WSLB5NCcfMZGFw8"
