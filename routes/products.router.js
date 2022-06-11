@@ -16,23 +16,14 @@ const service = new ProductsService();
 
 //Get all products
 router.get('/',
+    passport.authenticate('jwt', {session: false}),
+    checkAdminRole(),
+    validatorHandler(getProductSchema, 'query'),
     async (req, res) => {
         const rta = await service.findAll();
         res.status(200).json(rta);
     }
 );
-
-//GEt product by id
-router.get('/:id',
-    async (req, res, next) => {
-        try {
-            const rta = await service.findOne(req.params.id);
-            res.status(200).json(rta);
-        } catch (error) {
-            next(error);
-        }
-    }
-)
 
 //Create product
 router.post('/',

@@ -1,5 +1,5 @@
 const boom = require('@hapi/boom');
-const { Sequelize } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 
 const { models } = require('../libs/sequelize');
 
@@ -17,7 +17,7 @@ class Orders{
                     model: models.DeletedUsers
                 },{
                     association: 'orderItems',
-                    attributes: ['quantity'],
+                    attributes: ['id', 'quantity'], //DON'T CHANGE IF YOU WANNA LIVE
                     include: [{
                         association: 'product',
                         exclude: ['createdAt']
@@ -39,10 +39,33 @@ class Orders{
         return order;
     }
 
-    async findAll(){
-        const orders = await models.PurchaseOrders.findAll(this.includeAll);
+    async findAll(user, query){
+        let include = this.includeAll;
+        include.where = {};
 
-        return orders;
+        if(user.role != "admin" || query.self) include.where = {
+            buyerId: user.sub
+        }
+        if(user.role == 'admin' && query.buyerId != undefined) include.where.buyerId = query.buyerId;
+
+        if(query.finished) include.where.finishedAt = {
+            [Op.not]: null
+        }
+        if(query.notFinished) include.where.finishedAt = {
+            [Op.is]: null
+        }
+
+        if(query.id) include.where.id = query.id
+        if(query.offset) include.offset = query.offset;
+        if(query.limit) include.limit = query.limit;
+
+        const orders = await models.PurchaseOrders.findAll(include);
+        const count = await models.PurchaseOrders.count(include.where);
+
+        return {
+            orders,
+            count
+        };
     }
 
     async create(data) {
@@ -58,24 +81,22 @@ class Orders{
             const product = await models.Products.findByPk(item.productId);
     
             if (!product) {
-                throw boom.notFound('There is not a product with that id');  
+                throw boom.notFound(`There is not a product with the id: ${item.productId}`);  
             } 
     
             if (item.quantity > product.dataValues.stock) {
-                throw boom.badRequest(`The quantity of the product is greater than the stock. The product id is: ${item.productId}`);
+                throw boom.badRequest(`The quantity of the product is greater than the stock. The stock is ${product.dataValues.stock}. The product id is: ${item.productId}`);
             }
 
             products.push(product);
         }
 
         //Decrease the stock of the ordered product
-         for(let i = 0; i < products.length; i++){
+        for (let i = 0; i < products.length; i++) {
              const item = data.orderItems[i];
              const product = products[i];
              
-             await product.update({
-                 stock: product.dataValues.stock - item.quantity
-             })
+             await product.decrement('stock', {by: item.quantity});
          }
 
         //Create the purchase order
@@ -94,17 +115,25 @@ class Orders{
         return order;
     }   
 
-    async delete(id){
+    async update(changes){
+        const order = await models.PurchaseOrders.findById(changes.id);
+        delete changes.id
+
+        await order.update(changes);
+        return order;
+    }
+
+    async delete(id, user){
         const order = await this.findById(id);
 
-        order.dataValues.orderItems.forEach(async item => {
+        if(order.dataValues.buyerId != user.sub){
+            if(user.role != 'admin') throw boom.forbidden();
+        }
 
-            const stock = item.dataValues.product.dataValues.stock;
+        order.dataValues.orderItems.forEach(async item => {
             const quantity = item.dataValues.quantity;
 
-            await item.dataValues.product.update({
-                stock: stock + quantity
-            });
+            await item.dataValues.product.increment('stock', {by: quantity});
         })
 
         order.destroy();
@@ -113,7 +142,7 @@ class Orders{
     async setAsFinished(data) {
         const order = await this.findById(data.id);
 
-        if(order.dataValues.finishedAt != null)  throw boom.badRequest('The order is already set as finished');
+        if(order.dataValues.finishedAt != null) throw boom.badRequest('The order is already set as finished');
 
         await order.dataValues.orderItems.forEach(async item => {
             const product = item.dataValues.product.dataValues;
