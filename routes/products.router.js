@@ -16,11 +16,9 @@ const service = new ProductsService();
 
 //Get all products
 router.get('/',
-    passport.authenticate('jwt', {session: false}),
-    checkAdminRole(),
     validatorHandler(getProductSchema, 'query'),
     async (req, res) => {
-        const rta = await service.findAll();
+        const rta = await service.findAll(req.query);
         res.status(200).json(rta);
     }
 );
@@ -51,6 +49,7 @@ router.patch('/',
     }
 )
 
+//Delete Product
 router.delete('/',
     passport.authenticate('jwt', {session: false}),
     checkAdminRole(),

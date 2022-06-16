@@ -15,7 +15,11 @@ const uploadProductImageSchema = Joi.object({
 });
 
 const getProductSchema = Joi.object({
-    id: id.required()
+    id,
+    greater_than: price,
+    less_than: price,
+    limit: price,
+    offset: Joi.number()
 }); 
 
 const editProductSchema = Joi.object({

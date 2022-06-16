@@ -11,7 +11,7 @@ class Orders{
                 {
                     model: models.User,
                     attributes: {
-                        exclude: ['password', 'createdAt', 'role']
+                        exclude: ['password', 'role']
                     }
                 },{
                     model: models.DeletedUsers
@@ -116,8 +116,8 @@ class Orders{
     }   
 
     async update(changes){
-        const order = await models.PurchaseOrders.findById(changes.id);
-        delete changes.id
+        const order = await this.findById(changes.id);
+        delete changes.id;
 
         await order.update(changes);
         return order;
@@ -135,6 +135,30 @@ class Orders{
 
             await item.dataValues.product.increment('stock', {by: quantity});
         })
+
+        order.destroy();
+    }
+
+    async deleteFinishedPurchaseOrder(id){
+        const order = await this.findById(id, {
+            where: {
+                createdAt: {
+                    [Op.not]: null
+                }
+            }
+        });
+
+        //Verify if the user is a deleted user
+        if(!order.dataValues.buyer.createdAt){
+            const deletedUser = await models.DeletedUsers.findByPk(order.dataValues.buyer.id, {
+                include: [models.PurchaseOrders]
+            });
+
+            //If is a deleted user and this is the only order that has, delete the deleted user
+            if(deletedUser.dataValues.PurchaseOrders.length <= 1) {
+                deletedUser.destroy();
+            }
+        }
 
         order.destroy();
     }

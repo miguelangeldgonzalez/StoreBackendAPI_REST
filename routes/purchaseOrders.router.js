@@ -71,8 +71,11 @@ router.patch('/',
     validatorHandler(editOrderSchema, 'body'),
     checkAdminRole(),
     async (req, res, next) => {
+        if(req.user.role != "admin" && req.body.buyerId) delete req.body.buyerId;
+        
         try{
             const rta = await service.update(req.body);
+            if(req.body.buyerId) delete rta.buyer;
             res.status(201).json(rta);
         }catch (error) {
             next(error)

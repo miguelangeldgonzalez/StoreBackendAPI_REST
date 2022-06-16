@@ -59,7 +59,8 @@ class Sales extends Model {
         this.addHook('afterFind', findResult => polymorphic(findResult, 'Product', 'DeletedProduct', 'product'));
 
         this.belongsTo(models.PurchaseOrders, {
-            foreignKey: 'purchaseOrderId'
+            foreignKey: 'purchaseOrderId',
+            as: 'purchaseOrder'
         })
     }
 }

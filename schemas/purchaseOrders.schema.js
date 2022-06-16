@@ -21,7 +21,8 @@ const getChangeOrderSchema = Joi.object({id});
 
 const editOrderSchema = Joi.object({
     id,
-    direction
+    direction,
+    buyerId
 })
 
 const getOrderSchema = Joi.object({
