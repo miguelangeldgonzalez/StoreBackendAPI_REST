@@ -41,6 +41,10 @@ class Products{
 
         if(query.id) include.where.id = query.id;
 
+        if(query.name) include.where.name = {
+            [Op.substring]: query.name
+        }
+
         if(query.greater_than || query.less_than){
             include.order = [
                 ['price', 'ASC']

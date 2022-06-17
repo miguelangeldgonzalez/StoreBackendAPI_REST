@@ -18,6 +18,7 @@ const getProductSchema = Joi.object({
     id,
     greater_than: price,
     less_than: price,
+    name,
     limit: price,
     offset: Joi.number()
 }); 

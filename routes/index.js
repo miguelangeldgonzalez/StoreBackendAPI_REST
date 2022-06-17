@@ -6,6 +6,7 @@ const salesRouter = require('./sales.router');
 const productsRouter = require('./products.router');
 const deletedUsersRouter = require('./deletedUsers.router');
 const purchaseOrdersRouter = require('./purchaseOrders.router');
+const deletedProductsRouter = require('./deletedProducts.router');
 
 function routerApiV1(app){
     const router = express.Router();
@@ -17,6 +18,7 @@ function routerApiV1(app){
     router.use('/products', productsRouter);
     router.use('/deleted_users', deletedUsersRouter)
     router.use('/purchase_orders', purchaseOrdersRouter);
+    router.use('/deleted_products', deletedProductsRouter);
 }
 
 module.exports = routerApiV1;
