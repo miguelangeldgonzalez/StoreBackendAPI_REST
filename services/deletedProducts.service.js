@@ -12,8 +12,8 @@ class DeletedProducts {
         if(query.less_than || query.greater_than) {
             where.price = {};
 
-            if(query.less_than) where.price[Op.lte] = query.less_than;
-            if(query.greater_than) where.price[Op.gte] = query.greater_than;
+            if(query.lessThan) where.price[Op.lte] = query.lessThan;
+            if(query.greaterThan) where.price[Op.gte] = query.greaterThan;
         }
 
         if(query.name) where.name = {

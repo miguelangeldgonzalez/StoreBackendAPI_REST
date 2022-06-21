@@ -26,12 +26,12 @@
             const form = new FormData(document.querySelector("#form"));
             form.append('field', 'archivo');
             //a por f
-            form.append('id', '7dd6a482-1979-44d5-a396-55d83689376c');
+            form.append('id', "889467e2-86f1-4971-a0d7-3d2632361c9f");
             fetch('http://localhost:3000/api/v1/products/upload_product_images', {
                 method: 'POST',
                 body: form,
                 headers: {
-                    Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjEzLCJyb2xlIjoiY3VzdG9tZXIiLCJpYXQiOjE2NTM0OTA0MjF9.eh3BTEXDfRU7SZoXS_rl3Hf0XDXNw353KFGw_xSW62g'
+                    Authorization: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiI3ZGQxMjc3Zi1hMTM4LTQwNzEtOTMyZS01NjNmZDI5MGI3ZDUiLCJyb2xlIjoiYWRtaW4iLCJpYXQiOjE2NTQ4OTI2NTV9.YHF2Syi3oCwefnu87ExpjJdXipGynhJswgy_m-h6gvY'
                 }
             })
                 .then(response => response.json())
@@ -53,3 +53,4 @@
     </script>
 </body>
 </html>
+

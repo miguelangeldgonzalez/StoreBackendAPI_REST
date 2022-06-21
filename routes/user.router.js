@@ -16,12 +16,18 @@ const router = express.Router();
 const service = new UserService();
 
 //Delete Profile Photo
-router.get('/delete_profile_image', 
+router.delete('/delete_profile_image', 
     passport.authenticate('jwt', {session: false}),
     checkSameOrAdminRole(),
     async (req, res, next) => {
+        let id = req.user.sub;
+
+        if(req.user.role == 'admin'){
+            if(req.body.id) id = req.body.id;
+        }
+
         try{
-            const rta = await service.deleteProfilePhoto(req.user.sub);
+            const rta = await service.deleteProfilePhoto(id);
             if (rta) res.status(200).json({ message: "Image deleted correctly" });
         } catch (error) {
             next(error);
@@ -35,8 +41,13 @@ router.post('/upload_profile_image',
     uploadHandler(),
     async (req, res, next) => {
         try{
+            if(req.files.length < 0) throw boom.badRequest('No image sent');
+
             const rta = await service.loadProfileImage(req.files[0], req.user.sub);
-            if (rta) res.status(201).json({ message: "Image loaded correctly" });
+            if (rta) res.status(201).json({ 
+                message: "Image loaded correctly",
+                image: `http://localhost:3000/public/profile_photos/${req.user.sub}.png` 
+            });
         } catch (error) {
             next(error)
         }
@@ -61,9 +72,10 @@ router.post('/',
 router.get('/',
     passport.authenticate('jwt', {session: false}),
     checkAdminRole(),
+    validatorHandler(getUserSchema, 'params'),
     async (req, res, next) => {
         try{
-            const rta = await service.findAll();
+            const rta = await service.findAll(req.query);
             res.status(200).json(rta);
         } catch (error) {
             next(error);
@@ -74,6 +86,7 @@ router.get('/',
 //Get user by id
 router.get('/:id',
     passport.authenticate('jwt', {session: false}),
+    checkAdminRole(),
     validatorHandler(getUserSchema, 'params'),
     async (req, res) => {
         const id = req.params.id;
@@ -85,13 +98,17 @@ router.get('/:id',
 //Edit user
 router.patch('/',
     passport.authenticate('jwt', { session: false}),
-    checkSameOrAdminRole(),
-    validatorHandler(getUserSchema, 'query'),
     validatorHandler(updateUserSchema, 'body'),
     async (req, res, next) => {
+        let id = req.user.sub;
+
+        if(req.user.role == 'admin'){
+            if(req.body.id) id = req.body.id;
+        }
+
         try{
-            const rta = await service.update(req.user.sub, req.body);
-            res.status(202).json(rta);
+            const rta = await service.update(id, req.body);
+            res.status(200).json(rta);
             return rta;
         }catch(error){
             next(error);
@@ -109,7 +126,7 @@ router.delete('/',
 
         try {
             const rta = await service.delete(id);
-            res.status(202).json({
+            res.status(200).json({
                 message: "Deleted"
             })
         } catch(error){

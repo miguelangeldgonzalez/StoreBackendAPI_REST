@@ -8,7 +8,7 @@ const config = {
     dbUrl: process.env.DATABASE_URL,
     jwtSecret: process.env.JWT_SECRET,
     temporalStorage: path.resolve('./../public/temp'), //Folter to store the temporal storage
-    maxProductImage: 10, //Max of product images
+    maxProductImage: process.env.MAX_PRODUCT_IMAGES || 10, //Max of product images
     userEmail: process.env.USER_EMAIL, //Email to send recovery mails
     userPass: process.env.USER_PASS //Password to send recovery mails
 }

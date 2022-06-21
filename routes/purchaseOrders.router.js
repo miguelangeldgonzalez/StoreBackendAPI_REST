@@ -53,6 +53,7 @@ router.post('/',
 router.delete('/',
     passport.authenticate('jwt', {session: false}),
     validatorHandler(getChangeOrderSchema, 'body'),
+    checkAdminRole(),
     async (req, res, next) => {
         try{
             const rta = await service.delete(req.body.id, req.user);

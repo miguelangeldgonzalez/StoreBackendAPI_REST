@@ -50,11 +50,20 @@ class UserService{
         return rta;
     }
 
-    async findAll(){
+    async findAll(query){
+        let where = {}
+
+        if(query.name) where.name = {
+            [Op.substring]: query.name
+        }
+
+        if(query.id) where.id = query.id;
+
         const rta = await models.User.findAll({
             attributes: { 
                 exclude: ['password'] 
-            }
+            },
+            where
         });
 
         const users = rta.map(user => ({
@@ -119,16 +128,18 @@ class UserService{
     }
 
     async deleteProfilePhoto(userId){
+        this.findById(userId);
         const imagePath = path.resolve(`./public/profile_photos/${userId}.png`);
 
         if(fs.pathExistsSync(imagePath)){
             await fs.remove(imagePath);
             return true;
         }else{
-            throw boom.notFound("Error: The user doesn't have profile image");
+            throw boom.notFound("The user doesn't have profile image");
         }
 
     }
+
     async loadProfileImage(file, userId){
         try{
             const destination = path.resolve(`./public/profile_photos/${userId}.png`);
@@ -137,6 +148,7 @@ class UserService{
             await image.write(destination); // save
             
             await fs.remove(file.path);
+            return true;
         } catch (error) {
             throw boom.internal("The image could not be saved. Something went wrong on the server");
         }

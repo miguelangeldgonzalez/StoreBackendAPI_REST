@@ -55,6 +55,20 @@ class Orders{
             [Op.is]: null
         }
 
+        if(query.finishedBefore) include.where.finishedAt = {
+            [Op.lte]: query.finishedBefore
+        }
+        if(query.finishedAfter) include.where.finishedAt = {
+            [Op.gte]: query.finishedAfter
+        }
+
+        if(query.createdBefore) include.where.createdAt = {
+            [Op.lte]: query.createdBefore
+        }
+        if(query.createdAfter) include.where.createdAt = {
+            [Op.gte]: query.createdAfter
+        }
+
         if(query.id) include.where.id = query.id
         if(query.offset) include.offset = query.offset;
         if(query.limit) include.limit = query.limit;
@@ -126,9 +140,9 @@ class Orders{
     async delete(id, user){
         const order = await this.findById(id);
 
-        if(order.dataValues.buyerId != user.sub){
+        /*if(order.dataValues.buyerId != user.sub){
             if(user.role != 'admin') throw boom.forbidden();
-        }
+        }*/
 
         order.dataValues.orderItems.forEach(async item => {
             const quantity = item.dataValues.quantity;

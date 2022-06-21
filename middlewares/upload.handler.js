@@ -32,7 +32,7 @@ function productUploadHandler(){
             } 
 
             if(files[fields.field] == undefined) {
-                reject(boom.badRequest('Field not found'));
+                reject(boom.conflict('Field not found'));
                 return;
             }
 
@@ -48,7 +48,7 @@ function productUploadHandler(){
             const uploadedProductImages = await fs.readdir(destination);
 
             if(uploadedProductImages.length >= 10) {
-                reject(boom.badRequest(`This product exceeds the number of images allowed. Number of images allowed per product is ${maxProductImage}`));
+                reject(boom.conflict(`This product exceeds the number of images allowed. Number of images allowed per product is ${maxProductImage}`));
                 return;
             }
 
@@ -70,7 +70,7 @@ function productUploadHandler(){
 
                 resolve(uploadedImages);
             } else {
-                 reject(boom.badRequest('There are not file uploaded'));
+                 reject(boom.badRequest('There are not files uploaded'));
             }
         });
     })

@@ -56,7 +56,7 @@ class AuthService {
         })
     }
 
-    async changePassword(body){
+    async changePassword(body, tokenQuery){
         try{
             const token = await models.RecoveryTokens.findOne({
                 where: {
@@ -68,10 +68,10 @@ class AuthService {
             if(!token) throw boom.unauthorized();
 
             //Verify if the token is the same in the data base
-            if(token.dataValues.token != body.token) throw boom.unauthorized();
+            if(token.dataValues.token != tokenQuery) throw boom.unauthorized();
 
             //Verify if the token is singed with this secret and if the token is not expired
-            const payload = jwt.verify(body.token, config.jwtSecret);
+            const payload = jwt.verify(tokenQuery, config.jwtSecret);
 
             const user = await userService.findById(payload.sub);
 

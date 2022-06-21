@@ -1,4 +1,4 @@
-const { Op } = require('sequelize');
+const { Op, QueryError } = require('sequelize');
 const boom = require('@hapi/boom');
 
 const { models } = require('../libs/sequelize');
@@ -26,6 +26,10 @@ class Sales {
             if(query.minPrice) where.price[Op.gte] = query.minPrice;
         }
 
+        let options = {};
+
+        if(query.limit) options.limit = query.limit;
+        if(query.offset) options.offset = query.offset;
 
         return await models.Sales.findAll({
             include: [
@@ -37,6 +41,7 @@ class Sales {
                     }
                 }
             ],
+            ...options,
             attributes: ['id', 'price', 'quantity'],
             where
         });

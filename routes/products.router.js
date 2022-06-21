@@ -57,7 +57,9 @@ router.delete('/',
     async (req, res, next) => {
          try{
             const rta = await service.delete(req.body.id);
-            res.status(200).json(rta);
+            res.status(200).json({
+                message: "Product deleted"
+            });
          } catch(error) {
              next(error)
          }
@@ -80,7 +82,7 @@ router.delete('/delete_product_image',
         try {
             await service.deleteImageProduct(req.body.id, req.body.images, req.body.deleteAll);
             res.status(200).json({
-                message: "Image product deleted succesfuly"
+                message: "Images product deleted succesfuly"
             })
         } catch (error) {
             next(error);

@@ -9,7 +9,9 @@ const getSalesSchema = Joi.object({
     maxPrice: price,
     minPrice: price,
     maxQuantity: price,
-    minQuantity: price
+    minQuantity: price,
+    limit: price,
+    offset: price
 })
 
 const editSalesSchema = Joi.object({

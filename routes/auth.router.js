@@ -33,10 +33,10 @@ router.post('/recovery',
     }
 );
 
-router.post('/change-password',
+router.post('/change-password/:token',
     async (req, res, next) => {
         try {
-            const change = await service.changePassword(req.body);
+            const change = await service.changePassword(req.body, req.query.token);
             res.json({
                 message: 'Password changed'
             })

@@ -29,7 +29,7 @@ function checkSameOrAdminRole() {
             if (req.query.id != req.user.sub) next(boom.forbidden('Only permited same or admin'));
             next();
         }else{
-            next()
+            next();
         }
     }
 }

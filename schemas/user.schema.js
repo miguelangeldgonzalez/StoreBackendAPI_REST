@@ -11,11 +11,11 @@ const createUserSchema = Joi.object({
     lastName: name.required(),
     email: email.required(),
     password: password.required(),
-    role: role.required()
 })
 
 const getUserSchema = Joi.object({
-    id: id
+    id, 
+    name
 })
 
 const updateUserSchema = Joi.object({

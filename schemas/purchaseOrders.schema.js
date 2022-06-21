@@ -5,6 +5,7 @@ const offset = Joi.number();
 const id = Joi.string().guid();
 const buyerId = Joi.string().guid();
 const direction = Joi.string();
+const finished_before = Joi.date();
 
 const orderItems = Joi.array().items(Joi.object({
     quantity: Joi.number().positive().required(),
@@ -32,7 +33,11 @@ const getOrderSchema = Joi.object({
     notFinished: self,
     offset,
     limit: offset,
-    buyerId
+    buyerId,
+    finishedBefore: finished_before,
+    finishedAfter: finished_before,
+    createdBefore: finished_before,
+    createdAfter: finished_before
 })
 
 

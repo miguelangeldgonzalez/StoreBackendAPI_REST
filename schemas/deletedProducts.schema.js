@@ -7,8 +7,8 @@ const price = Joi.number();
 const getDeletedProducts = Joi.object({
     id,
     name,
-    less_than: price,
-    greater_than: price
+    lessThan: price,
+    greaterThan: price
 })
 
 const deleteDeletedProducts = Joi.object({
