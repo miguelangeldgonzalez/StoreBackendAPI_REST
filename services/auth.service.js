@@ -3,7 +3,7 @@ const boom = require('@hapi/boom');
 const jwt = require('jsonwebtoken');
 const nodemailer = require('nodemailer');
 
-const {models} = require('sequelize');
+const {models} = require('../libs/sequelize');
 
 const config = require('./../config/config');
 const UserService = require('./user.service');
@@ -26,10 +26,10 @@ class AuthService {
     }
 
     async sendMail(mail) {
-        const user = userService.findByEmail(mail);
+        const user = await userService.findByEmail(mail);
         if(!user) throw boom.unauthorized();
 
-        const transporter = nodemailer.createTransporter({
+        const transporter = nodemailer.createTransport({
             host: 'smtp.gmail.com',
             secure: true,
             port: 465,
@@ -46,13 +46,13 @@ class AuthService {
         const token = jwt.sign(payload, config.jwtSecret, {expiresIn: '15min'});
         const link = `https://frontend.com/recovery?${token}`;
 
-        models.RecoveryTokens.create(token);
+        await models.RecoveryTokens.create({token});
 
         await transporter.sendMail({
             from: config.userEmail,
             to: mail,
             subject: 'Password Recovery',
-            text: `Click here to recovery your password: ${link}`
+            text: `Here is your recovery token: ${link}`
         })
     }
 
@@ -60,33 +60,29 @@ class AuthService {
         try{
             const token = await models.RecoveryTokens.findOne({
                 where: {
-                    token: body.token
+                    token: tokenQuery
                 }
             })
 
             //Verify if the token is in the data base
             if(!token) throw boom.unauthorized();
-
+            
             //Verify if the token is the same in the data base
             if(token.dataValues.token != tokenQuery) throw boom.unauthorized();
 
+            await token.destroy();
+            
             //Verify if the token is singed with this secret and if the token is not expired
             const payload = jwt.verify(tokenQuery, config.jwtSecret);
 
-            const user = await userService.findById(payload.sub);
-
-            //Verify if the user of the payload exists
-            if(!user) throw boom.unauthorized();
-
             const hash = await bcrypt.hash(body.newPassword, 10);
             
-            await user.update({
+            await userService.update(payload.sub, {
                 password: hash
             })
 
-            await token.destroy()
         } catch (error) {
-            throw boom.unauthorized();
+            throw error;
         }
     }
 }

@@ -1,8 +1,13 @@
 const {Model, DataTypes} = require('sequelize');
 
-const RECOVERY_TOKENS_TABLE = 'recovery_token';
+const RECOVERY_TOKENS_TABLE = 'recovery_tokens';
 
 const RecoveryTokensSchema = {
+    id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true,
+        autoIncrement: true
+    },
     token: {
         allowNull: true,
         type: DataTypes.STRING
@@ -14,7 +19,8 @@ class RecoveryTokens extends Model {
         return {
             sequelize,
             tableName: 'recovery_tokens',
-            modelName: 'RecoveryTokens'
+            modelName: 'RecoveryTokens',
+            timestamps: false
         }
     }
 }
