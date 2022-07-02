@@ -1,6 +1,6 @@
-const { User, UserSchema } = require('./user.model.js');
+const { User, UserSchema } = require('./user.model');
 const { Sales, SalesSchema } = require('./sales.model'); 
-const { Products, ProductsSchema } = require('./Products.model');
+const { Products, ProductsSchema } = require('./products.model');
 const { OrderItems, OrderItemsSchema } = require('./orderItems.model');
 const { DeletedUsers, DeletedUsersSchema } = require('./deletedUsers.model');
 const { RecoveryTokens, RecoveryTokensSchema } = require('./recoveryTokens.model');
